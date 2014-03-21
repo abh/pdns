@@ -21,10 +21,10 @@
 #include "namespaces.hh"
 #include <boost/foreach.hpp>
 
-uint32_t localtime_format_YYYYMMDDSS(time_t t, uint32_t seq)
+uint32_t gmtime_format_YYYYMMDDSS(time_t t, uint32_t seq)
 {
   struct tm tm;
-  localtime_r(&t, &tm);
+  gmtime_r(&t, &tm);
   return
       (uint32_t)(tm.tm_year+1900) * 1000000u
     + (uint32_t)(tm.tm_mon + 1) * 10000u
@@ -55,12 +55,12 @@ bool editSOA(DNSSECKeeper& dk, const string& qname, DNSPacket* dp)
 uint32_t calculateEditSoa(SOAData sd, const string& kind) {
   if(pdns_iequals(kind,"INCEPTION")) {
     time_t inception = getStartOfWeek();
-    return localtime_format_YYYYMMDDSS(inception, 1);
+    return gmtime_format_YYYYMMDDSS(inception, 1);
   }
   else if(pdns_iequals(kind,"INCEPTION-INCREMENT")) {
     time_t inception = getStartOfWeek();
-    uint32_t inception_serial = localtime_format_YYYYMMDDSS(inception, 1);
-    uint32_t dont_increment_after = localtime_format_YYYYMMDDSS(inception + 2*86400, 99);
+    uint32_t inception_serial = gmtime_format_YYYYMMDDSS(inception, 1);
+    uint32_t dont_increment_after = gmtime_format_YYYYMMDDSS(inception + 2*86400, 99);
 
     if(sd.serial < inception_serial - 1) { /* less than <inceptionday>00 */
       return inception_serial; /* return <inceptionday>01   (skipping <inceptionday>00 as possible value) */
